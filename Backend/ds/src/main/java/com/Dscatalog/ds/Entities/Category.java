@@ -3,6 +3,7 @@ package com.Dscatalog.ds.Entities;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
 
 @Entity
@@ -14,6 +15,12 @@ public class Category implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+
+    @Column
+    private Instant createdAt;
+
+    @Column
+    private Instant updatedAt;
 
     public Category(){}
 
@@ -37,6 +44,24 @@ public class Category implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    @PrePersist
+    public void prePersist(){
+        createdAt = Instant.now(); // salva horário criada categoria do banco com padroes utc
+    }
+    @PreUpdate
+    public void updatePersist(){
+        updatedAt = Instant.now();  // salva horário atualizado categoria do banco com padroes utc
+    }
+
 
     @Override
     public boolean equals(Object o) {
