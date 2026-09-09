@@ -6,9 +6,12 @@ import com.Dscatalog.ds.Repositories.CategoryRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,9 +25,9 @@ public class CategoryService {
 
 
     @Transactional(readOnly = true)
-    public List<CategoryDto> findAll(){
-        List<Category> list =  categoryRepository.findAll();
-        return list.stream().map(x -> new CategoryDto(x)).collect(Collectors.toList());
+    public Page<CategoryDto> findAllPaged(PageRequest pageRequest){
+        Page<Category> list =  categoryRepository.findAll(pageRequest);
+        return list.map(x -> new CategoryDto(x));
 
        /*  outro exemplo com for each acima sera usada expressao lambda com map.
         List<CategoryDto> listDto = new ArrayList<>();
