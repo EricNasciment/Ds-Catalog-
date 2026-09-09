@@ -39,4 +39,10 @@ public class CategoryResources {
                 .buildAndExpand(dto.getId()).toUri();
         return ResponseEntity.created(uri).body(dto);
     }
+
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<CategoryDto> update( @PathVariable Long id,  @RequestBody CategoryDto dto){
+       dto = categoryService.update(id,dto);
+     return ResponseEntity.ok().body(dto);
+    }
 }
