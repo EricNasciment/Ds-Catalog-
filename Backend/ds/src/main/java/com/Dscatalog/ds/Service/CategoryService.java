@@ -75,7 +75,7 @@ public class CategoryService {
          categoryRepository.deleteById(id);
      }
      catch (DataIntegrityViolationException e){
-         throw new DataBaseException("Falha de Integridade no banco");
+         throw new DataBaseException("Entidade não pode ser deletada,Falha de Integridade no banco");
      }
     }
 }
