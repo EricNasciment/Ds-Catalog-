@@ -96,5 +96,7 @@ public class ProductDto implements Serializable {
         this.date = date;
     }
 
-
+    public List<CategoryDto> getCategories() {
+        return categories;
+    }
 }

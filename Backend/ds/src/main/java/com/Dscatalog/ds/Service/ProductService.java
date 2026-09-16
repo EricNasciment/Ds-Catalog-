@@ -1,9 +1,11 @@
 package com.Dscatalog.ds.Service;
 
 
+import com.Dscatalog.ds.Dto.CategoryDto;
 import com.Dscatalog.ds.Dto.ProductDto;
 import com.Dscatalog.ds.Entities.Category;
 import com.Dscatalog.ds.Entities.Product;
+import com.Dscatalog.ds.Repositories.CategoryRepository;
 import com.Dscatalog.ds.Repositories.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,27 +24,27 @@ public class ProductService {
     @Autowired
   private ProductRepository productRepository;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
 @Transactional(readOnly = true)
 public Page<ProductDto> findPagedAll(PageRequest pageRequet){
     Page<Product> list = productRepository.findAll(pageRequet);
-   return list.map(x -> new ProductDto(x));
+    return list.map(x -> new ProductDto(x));
+
 }
 
 @Transactional(readOnly = true)
 public ProductDto findById(Long id){
     Optional<Product>  obj = productRepository.findById(id);
    Product entity = obj.orElseThrow(() -> new ResourceNotFoundException("Id não encontrado"));
-    return new ProductDto(entity);
+    return new ProductDto(entity,entity.getCategories());
 }
 
 @Transactional
 public ProductDto insert(ProductDto dto){
        Product  entity = new Product();
-       entity.setName(dto.getName());
-       entity.setDescription(dto.getDescription());
-       entity.setPrice(dto.getPrice());
-       entity.setImgUrl(dto.getImgUrl());
-       entity.setDate(dto.getDate());
+       copyDtoToEntity(dto,entity);
        entity = productRepository.save(entity);
        return new ProductDto(entity);
 }
@@ -52,11 +54,7 @@ public ProductDto update(ProductDto dto, Long id){
 
     try {
         Product entity = productRepository.getReferenceById(id);
-        entity.setName(dto.getName());
-        entity.setDescription(dto.getDescription());
-        entity.setPrice(dto.getPrice());
-        entity.setImgUrl(dto.getImgUrl());
-        entity.setDate(dto.getDate());
+        copyDtoToEntity(dto,entity);
         entity = productRepository.save(entity);
         return new ProductDto(entity);
     }
@@ -78,4 +76,19 @@ public void delete(Long id){
     }
 
 }
-}
+
+   private void copyDtoToEntity(ProductDto dto,Product entity){
+       entity.setName(dto.getName());
+       entity.setDescription(dto.getDescription());
+       entity.setPrice(dto.getPrice());
+       entity.setImgUrl(dto.getImgUrl());
+       entity.setDate(dto.getDate());
+
+       entity.getCategories().clear();
+       for(CategoryDto catDto : dto.getCategories()){
+           Category category = categoryRepository.getOne(catDto.getId());
+           entity.getCategories().add(category);
+       }
+   }
+
+ }
